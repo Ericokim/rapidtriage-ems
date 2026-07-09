@@ -32,18 +32,25 @@ npm run build:shared
 ```
 
 Create the two env files (see below), create the database, then run everything
-with a single command:
+with a single command that also opens a simulator:
 
 ```bash
-npm run dev      # shared watcher + API + Expo, all together (via concurrently)
+npm run dev:ios      # shared watcher + API + Expo, and boots the iOS Simulator
+npm run dev:android  # ...or the Android emulator
+npm run dev          # bundler + API only (open a device yourself with i / a / Expo Go)
 ```
 
 Or run the pieces in separate terminals if you prefer:
 
 ```bash
 npm run api      # terminal 1 — Express API on :4000
-npm run mobile   # terminal 2 — Expo dev server
+npm run mobile   # terminal 2 — Expo dev server, then press i (iOS) or a (Android)
 ```
+
+> **This is a native app.** Metro serves the JS; the app itself appears in the
+> iOS Simulator, Android emulator, or Expo Go — not in a web browser. Web builds
+> use an ephemeral in-memory store, so use a simulator/device for the real
+> offline-sync demo.
 
 ## Workspace Layout
 

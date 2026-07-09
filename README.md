@@ -193,26 +193,44 @@ Response:
 ## Running the Project
 
 ```bash
-npm install         # install all workspaces
+npm install          # install all workspaces
 
-# Run everything at once (builds shared, then runs a shared watcher + API + Expo):
+# Run everything at once AND open a simulator (recommended):
+npm run dev:ios      # shared watcher + API + Expo, and boots the iOS Simulator
+npm run dev:android  # ...or the Android emulator
+
+# Run the bundler + API without auto-opening a device (use Expo Go / press i,a):
 npm run dev
 
 # ...or run pieces individually:
 npm run build:shared # compile the shared package
-npm run api         # start the Express API
-npm run mobile      # start the Expo app
+npm run api          # start the Express API
+npm run mobile       # start the Expo dev server
 
-npm run test        # run all tests
-npm run typecheck   # typecheck all workspaces
-npm run lint        # lint mobile + api
+npm run test         # run all tests
+npm run typecheck    # typecheck all workspaces
+npm run lint         # lint mobile + api
 ```
 
-> `npm run dev` uses [`concurrently`](https://www.npmjs.com/package/concurrently)
-> to run the shared-package watcher, the API, and the Expo dev server together
-> with prefixed, colour-coded output. It expects `apps/api/.env` (with
-> `DATABASE_URL`) and `apps/mobile/.env` to exist — see below. Press `Ctrl+C`
-> once to stop all three.
+### How to actually see the app
+
+This is a **native** React Native app, so the dev server (Metro) does not display
+the app itself — it serves the JS to a client. Open one of:
+
+- **iOS Simulator** — `npm run dev:ios` (or press `i` in the Expo output)
+- **Android emulator** — `npm run dev:android` (or press `a`)
+- **Expo Go** on a physical phone — scan the QR code in the Expo output
+
+> **Web is not a target.** Expo SQLite uses the device's native SQLite on
+> iOS/Android; on web the app falls back to ephemeral in-memory storage
+> (`src/db/client.web.ts`) so the browser build doesn't break, but real offline
+> persistence and the demo only work on a simulator/device. Don't judge the app
+> by opening `http://localhost:8081` in a browser.
+
+> `npm run dev*` uses [`concurrently`](https://www.npmjs.com/package/concurrently)
+> to run the shared-package watcher, the API, and Expo together with prefixed,
+> colour-coded output. It expects `apps/api/.env` (with `DATABASE_URL`) and
+> `apps/mobile/.env` to exist — see below. Press `Ctrl+C` once to stop all of them.
 
 ## Environment Variables
 
