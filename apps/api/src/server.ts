@@ -10,7 +10,6 @@ function start() {
   const app = createApp({ triageRepository });
 
   app.listen(env.PORT, () => {
-    // eslint-disable-next-line no-console
     console.log(`RapidTriage API running on port ${env.PORT}`);
   });
 }

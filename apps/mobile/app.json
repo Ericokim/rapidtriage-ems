@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "RapidTriage EMS",
+    "slug": "rapidtriage-ems",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "rapidtriage",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "output": "static",
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

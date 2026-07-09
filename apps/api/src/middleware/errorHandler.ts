@@ -13,7 +13,6 @@ export class HttpError extends Error {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export function errorHandler(
   err: unknown,
   _req: Request,
@@ -30,7 +29,6 @@ export function errorHandler(
   }
 
   // Unexpected error: never leak internals to the client.
-  // eslint-disable-next-line no-console
   console.error("Unexpected API error:", err);
   res.status(500).json({ ok: false, error: "Internal server error" });
 }

@@ -1,0 +1,28 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+/*
+ * RapidTriage EMS design tokens.
+ * Mirrors context/ui-tokens.md. Semantic colors for an emergency field tool.
+ */
+@theme {
+  --color-brand: #1565c0;
+  --color-brand-dark: #0d47a1;
+  --color-brand-light: #e3f2fd;
+
+  --color-priority-1: #b71c1c;
+  --color-priority-2: #e65100;
+  --color-priority-3: #f9a825;
+  --color-priority-4: #1565c0;
+  --color-priority-5: #2e7d32;
+
+  --color-status-pending: #6b7280;
+  --color-status-syncing: #2563eb;
+  --color-status-synced: #2e7d32;
+  --color-status-failed: #c62828;
+  --color-status-offline: #4b5563;
+  --color-status-online: #2e7d32;
+}
