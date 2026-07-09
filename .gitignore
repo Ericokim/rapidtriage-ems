@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Build outputs
+build/
+apps/api/dist/
+packages/shared/dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Testing
+coverage/
+
+# Drizzle
+drizzle/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+*.swp
+
+# Local Claude session artifacts
+.remember/

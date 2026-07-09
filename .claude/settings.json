@@ -1,0 +1,60 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run mobile)",
+      "Bash(npm run api)",
+      "Bash(npm run test)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:shared)",
+      "Bash(npm --workspace apps/mobile run start)",
+      "Bash(npm --workspace apps/api run dev)",
+      "Bash(npm --workspace apps/api run db:generate)",
+      "Bash(npm --workspace apps/api run db:migrate)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Read(README.md)",
+      "Read(SETUP.md)",
+      "Read(ARCHITECTURE.md)",
+      "Read(DEMO.md)",
+      "Read(TESTING.md)",
+      "Read(CLAUDE.md)",
+      "Read(context/**)",
+      "Read(apps/mobile/**)",
+      "Read(apps/api/**)",
+      "Read(packages/shared/**)",
+      "Write(context/progress-tracker.md)",
+      "Write(context/ui-registry.md)",
+      "Write(apps/mobile/**)",
+      "Write(apps/api/**)",
+      "Write(packages/shared/**)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*secret*)",
+      "Read(**/*token*)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/lint-on-save.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

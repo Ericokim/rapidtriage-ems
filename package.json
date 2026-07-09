@@ -1,0 +1,20 @@
+{
+  "name": "rapidtriage-ems",
+  "version": "1.0.0",
+  "description": "Offline-first paramedic triage intake application",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "apps/api",
+    "apps/mobile"
+  ],
+  "scripts": {
+    "mobile": "npm --workspace apps/mobile run start",
+    "api": "npm --workspace apps/api run dev",
+    "build:shared": "npm --workspace @rapidtriage/shared run build",
+    "test": "npm --workspace @rapidtriage/shared run test && npm --workspace apps/api run test && npm --workspace apps/mobile run test",
+    "typecheck": "npm --workspace @rapidtriage/shared run typecheck && npm --workspace apps/api run typecheck && npm --workspace apps/mobile run typecheck",
+    "lint": "npm --workspace apps/api run lint && npm --workspace apps/mobile run lint"
+  },
+  "license": "MIT"
+}
