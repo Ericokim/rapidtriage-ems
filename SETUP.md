@@ -31,7 +31,14 @@ npm install
 npm run build:shared
 ```
 
-Create the two env files (see below), create the database, then:
+Create the two env files (see below), create the database, then run everything
+with a single command:
+
+```bash
+npm run dev      # shared watcher + API + Expo, all together (via concurrently)
+```
+
+Or run the pieces in separate terminals if you prefer:
 
 ```bash
 npm run api      # terminal 1 — Express API on :4000

@@ -194,13 +194,25 @@ Response:
 
 ```bash
 npm install         # install all workspaces
+
+# Run everything at once (builds shared, then runs a shared watcher + API + Expo):
+npm run dev
+
+# ...or run pieces individually:
 npm run build:shared # compile the shared package
 npm run api         # start the Express API
 npm run mobile      # start the Expo app
+
 npm run test        # run all tests
 npm run typecheck   # typecheck all workspaces
 npm run lint        # lint mobile + api
 ```
+
+> `npm run dev` uses [`concurrently`](https://www.npmjs.com/package/concurrently)
+> to run the shared-package watcher, the API, and the Expo dev server together
+> with prefixed, colour-coded output. It expects `apps/api/.env` (with
+> `DATABASE_URL`) and `apps/mobile/.env` to exist — see below. Press `Ctrl+C`
+> once to stop all three.
 
 ## Environment Variables
 

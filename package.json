@@ -9,6 +9,8 @@
     "apps/mobile"
   ],
   "scripts": {
+    "dev": "npm run build:shared && concurrently -k -n shared,api,mobile -c cyan,blue,magenta \"npm run dev:shared\" \"npm run api\" \"npm run mobile\"",
+    "dev:shared": "npm --workspace @rapidtriage/shared run dev",
     "mobile": "npm --workspace apps/mobile run start",
     "api": "npm --workspace apps/api run dev",
     "build:shared": "npm --workspace @rapidtriage/shared run build",
@@ -18,6 +20,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "eslint": "^9.25.0"
   },
   "overrides": {
