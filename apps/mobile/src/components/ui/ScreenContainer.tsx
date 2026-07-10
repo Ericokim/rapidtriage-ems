@@ -1,41 +1,52 @@
 import type { PropsWithChildren } from "react";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors } from "../../theme/tokens";
 
 interface ScreenContainerProps extends PropsWithChildren {
   scroll?: boolean;
+  /** Apply top safe-area padding (screens with their own header pass false). */
+  safeTop?: boolean;
+  padded?: boolean;
 }
 
 /**
- * Standard screen wrapper: safe-area padding + slate background.
- *
- * We use a plain `View` (which NativeWind styles via className) plus
- * `useSafeAreaInsets`, rather than `SafeAreaView` from
- * react-native-safe-area-context — NativeWind does not apply `className` to that
- * third-party component, which would collapse the layout to zero height.
+ * White screen wrapper. Uses a plain View + useSafeAreaInsets (NativeWind does
+ * not style third-party SafeAreaView).
  */
 export function ScreenContainer({
   children,
   scroll = true,
+  safeTop = true,
+  padded = true,
 }: ScreenContainerProps) {
   const insets = useSafeAreaInsets();
+  const paddingTop = safeTop ? insets.top + 8 : 0;
+  const paddingHorizontal = padded ? 20 : 0;
+
+  if (!scroll) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.white, paddingTop, paddingHorizontal }}>
+        {children}
+      </View>
+    );
+  }
 
   return (
-    <View
-      className="flex-1 bg-slate-50"
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-    >
-      {scroll ? (
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ padding: 16, gap: 16 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          {children}
-        </ScrollView>
-      ) : (
-        <View className="flex-1 gap-4 px-4 py-4">{children}</View>
-      )}
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingTop,
+          paddingHorizontal,
+          paddingBottom: 24,
+          gap: 16,
+        }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {children}
+      </ScrollView>
     </View>
   );
 }

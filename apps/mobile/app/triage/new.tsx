@@ -1,56 +1,42 @@
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { router } from "expo-router";
 import type { TriageFormValues } from "@rapidtriage/shared";
 import { TriageForm } from "@/src/components/triage/TriageForm";
-import { AppButton } from "@/src/components/ui/AppButton";
-import { AppHeader } from "@/src/components/ui/AppHeader";
+import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
 import { useSync } from "@/src/hooks/useSync";
+import { colors } from "@/src/theme/tokens";
 
 export default function NewTriageScreen() {
   const { submitTriage } = useSync();
+  const { isOnline } = useNetworkStatus();
   const [submitting, setSubmitting] = useState(false);
-  const [savedOffline, setSavedOffline] = useState<boolean | null>(null);
 
   async function handleSubmit(values: TriageFormValues) {
     setSubmitting(true);
     try {
-      const { wasOnline } = await submitTriage(values);
-      setSavedOffline(!wasOnline);
+      const { record, wasOnline } = await submitTriage(values);
+      router.replace({
+        pathname: "/triage/saved-offline",
+        params: { id: record.id, offline: wasOnline ? "0" : "1" },
+      });
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (savedOffline !== null) {
-    return (
-      <ScreenContainer>
-        <AppHeader title="Triage saved" />
-        <View className="gap-1 rounded-2xl border border-green-200 bg-green-50 p-4">
-          <Text className="text-base font-semibold text-green-800">
-            {savedOffline ? "Saved offline" : "Record saved"}
-          </Text>
-          <Text className="text-sm text-green-700">
-            {savedOffline
-              ? "Record is safe on this device and will sync automatically."
-              : "Record was saved locally and is syncing."}
-          </Text>
-        </View>
-        <AppButton label="New Triage" onPress={() => setSavedOffline(null)} />
-        <AppButton
-          label="Back to Home"
-          variant="secondary"
-          onPress={() => router.replace("/")}
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <ScreenHeader title="New Triage" />
+      <ScreenContainer safeTop={false}>
+        <TriageForm
+          onSubmit={handleSubmit}
+          submitting={submitting}
+          isOnline={isOnline}
         />
       </ScreenContainer>
-    );
-  }
-
-  return (
-    <ScreenContainer>
-      <AppHeader title="New Triage" subtitle="Offline-safe intake" />
-      <TriageForm onSubmit={handleSubmit} submitting={submitting} />
-    </ScreenContainer>
+    </View>
   );
 }

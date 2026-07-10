@@ -1,47 +1,72 @@
-import { Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, Text, View } from "react-native";
+import { Avatar } from "./Avatar";
+import { PriorityBadge } from "../ui/PriorityBadge";
 import { StatusBadge } from "../ui/StatusBadge";
-import { PRIORITY_CHIP, priorityLabel } from "../../theme/tokens";
+import { colors, shadows } from "../../theme/tokens";
 
 interface TriageRecordCardProps {
   record: LocalTriageRecord;
+  onPress?: () => void;
+  /** Override the middle subtitle (defaults to the condition description). */
+  subtitle?: string;
+  onRetry?: () => void;
 }
 
 function formatTime(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString();
+  return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
-export function TriageRecordCard({ record }: TriageRecordCardProps) {
-  const priorityStyle = PRIORITY_CHIP[record.priorityLevel];
-
+export function TriageRecordCard({
+  record,
+  onPress,
+  subtitle,
+  onRetry,
+}: TriageRecordCardProps) {
   return (
-    <View className="gap-2 rounded-2xl border border-slate-200 bg-white p-4">
-      <View className="flex-row items-center justify-between">
-        <Text className="flex-1 text-base font-semibold text-slate-950">
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      className="flex-row items-center gap-3 rounded-2xl p-3.5"
+      style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.slate100, ...shadows.soft }}
+    >
+      <Avatar priority={record.priorityLevel} />
+
+      <View className="flex-1 gap-1">
+        <Text className="text-base font-bold" style={{ color: colors.navy950 }}>
           {record.patientName}
         </Text>
+        <Text className="text-sm" style={{ color: colors.slate500 }} numberOfLines={1}>
+          {subtitle ?? record.conditionDescription}
+        </Text>
+        <View className="flex-row items-center gap-1">
+          <Ionicons name="time-outline" size={13} color={colors.slate400} />
+          <Text className="text-xs" style={{ color: colors.slate400 }}>
+            {formatTime(record.createdAt)}
+          </Text>
+        </View>
+      </View>
+
+      <View className="items-end gap-1.5">
+        <PriorityBadge priority={record.priorityLevel} />
         <StatusBadge status={record.syncStatus} />
       </View>
 
-      <Text className="text-sm text-slate-500" numberOfLines={2}>
-        {record.conditionDescription}
-      </Text>
-
-      <View className="flex-row items-center gap-2">
-        <View
-          className={`rounded-full border px-2.5 py-1 ${priorityStyle.selected}`}
+      {onRetry ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Retry sync"
+          onPress={onRetry}
+          hitSlop={8}
+          style={{ width: 40, height: 40, borderRadius: 12, borderWidth: 1, borderColor: colors.slate200, alignItems: "center", justifyContent: "center" }}
         >
-          <Text className={`text-xs font-bold ${priorityStyle.selectedText}`}>
-            P{record.priorityLevel} {priorityLabel(record.priorityLevel)}
-          </Text>
-        </View>
-        <Text className="text-xs text-slate-500">{record.status}</Text>
-      </View>
-
-      <Text className="text-xs text-slate-400">
-        Created {formatTime(record.createdAt)}
-      </Text>
-    </View>
+          <Ionicons name="sync" size={18} color={colors.navy950} />
+        </Pressable>
+      ) : (
+        <Ionicons name="chevron-forward" size={20} color={colors.slate300} />
+      )}
+    </Pressable>
   );
 }

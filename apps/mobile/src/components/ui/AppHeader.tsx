@@ -1,17 +1,18 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Brand } from "./Brand";
+import { ConnectionBadge } from "./ConnectionBadge";
 
 interface AppHeaderProps {
-  title: string;
+  isOnline: boolean;
   subtitle?: string;
 }
 
-export function AppHeader({ title, subtitle }: AppHeaderProps) {
+/** Top app header used on the main tab screens (logo + connection badge). */
+export function AppHeader({ isOnline, subtitle }: AppHeaderProps) {
   return (
-    <View className="gap-1">
-      <Text className="text-2xl font-bold text-slate-950">{title}</Text>
-      {subtitle ? (
-        <Text className="text-sm text-slate-500">{subtitle}</Text>
-      ) : null}
+    <View className="flex-row items-center justify-between">
+      <Brand subtitle={subtitle} />
+      <ConnectionBadge isOnline={isOnline} />
     </View>
   );
 }

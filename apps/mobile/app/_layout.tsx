@@ -15,7 +15,12 @@ export default function RootLayout() {
           <NetworkProvider>
             <SyncProvider>
               <StatusBar style="dark" />
-              <Stack screenOptions={{ headerShown: false }} />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="triage/new" />
+                <Stack.Screen name="triage/saved-offline" />
+                <Stack.Screen name="records/[id]" />
+              </Stack>
             </SyncProvider>
           </NetworkProvider>
         </QueryProvider>

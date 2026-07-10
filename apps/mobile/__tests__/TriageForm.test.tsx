@@ -1,15 +1,16 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { TriageForm } from "@/src/components/triage/TriageForm";
 
-const NAME_PLACEHOLDER = "e.g. John Kamau";
-const CONDITION_PLACEHOLDER = "e.g. Chest pain and shortness of breath";
+const NAME_PLACEHOLDER = "Enter patient full name";
+const CONDITION_PLACEHOLDER =
+  "Describe the patient’s condition, symptoms, injuries, etc.";
 
 describe("TriageForm", () => {
   it("keeps submit disabled until valid, then submits the values", async () => {
     const onSubmit = jest.fn();
     const screen = render(<TriageForm onSubmit={onSubmit} />);
 
-    const submit = screen.getByRole("button", { name: "Submit Triage" });
+    const submit = screen.getByRole("button", { name: "Save & Submit" });
     expect(submit).toBeDisabled();
 
     fireEvent.changeText(
