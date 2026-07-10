@@ -6,15 +6,17 @@ Built with React Native and Expo (TypeScript). The backend API and Postgres data
 
 - **Repository:** https://github.com/Ericokim/rapidtriage-ems
 - **Live API:** https://rapidtriage-api.onrender.com/health
-- **Android APK:** [download and install](https://expo.dev/artifacts/eas/eyH3-wZlwemtlOLdFdThJwSthFIlhnImzTdskYOQUKM.apk)
+- **Android APK:** [download from the v1.0.0 release](https://github.com/Ericokim/rapidtriage-ems/releases/download/v1.0.0/rapidtriage-ems-v1.0.0.apk) (sideload on an Android device; it talks to the live API and works offline)
 
-## Demo
+## Demo — save offline, sync on reconnect
+
+The whole assessment in one run, recorded end to end on a device with no cuts: with **Airplane Mode on**, a paramedic captures and saves a patient; the moment connectivity returns, the record uploads to the backend on its own — no error screen, nothing lost.
 
 <p align="center">
-  <img src="docs/demo.gif" alt="RapidTriage EMS walkthrough" width="300" />
+  <img src="docs/demo.gif" alt="RapidTriage EMS airplane-mode demo" width="300" />
 </p>
 
-A quick run through the app: launch and onboarding, the dashboard, capturing a triage, the local-save confirmation, the records history with live sync status, a record detail, and settings. Records land in on-device storage first, and anything pending uploads by itself once the connection comes back. Pulling down to refresh re-checks connectivity and drains the queue on demand.
+What the recording shows: online dashboard → turn on **Airplane Mode** (status flips to Offline) → create a Priority 2 patient and confirm → *"Triage saved safely — queued"* with no error → turn **Airplane Mode off** → the queued record auto-syncs and turns green (**Synced**). Pulling down to refresh re-checks connectivity and drains the queue on demand.
 
 ## Screenshots
 
