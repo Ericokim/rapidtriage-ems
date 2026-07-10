@@ -16,6 +16,7 @@ import { StatusSegmentedControl } from "./StatusSegmentedControl";
 import { AppButton } from "../ui/AppButton";
 import { AppInput } from "../ui/AppInput";
 import { AppTextArea } from "../ui/AppTextArea";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { PriorityBadge } from "../ui/PriorityBadge";
 import { colors } from "../../theme/tokens";
 
@@ -23,14 +24,32 @@ interface TriageFormProps {
   onSubmit: (values: TriageFormValues) => void | Promise<void>;
   submitting?: boolean;
   onStepChange?: (step: 1 | 2) => void;
+  /** Pre-fill the form (edit mode). Omit for a blank new-intake form. */
+  initialValues?: TriageFormValues;
+  submitLabel?: string;
+  submitIcon?: React.ComponentProps<typeof Ionicons>["name"];
+  confirmTitle?: string;
+  confirmMessage?: string;
+  confirmLabel?: string;
 }
 
 const emptyPriority = null as unknown as TriagePriority;
 const emptyStatus = null as unknown as TriageStatus;
 
-export function TriageForm({ onSubmit, submitting = false, onStepChange }: TriageFormProps) {
+export function TriageForm({
+  onSubmit,
+  submitting = false,
+  onStepChange,
+  initialValues,
+  submitLabel = "Save & Submit",
+  submitIcon = "cloud-upload-outline",
+  confirmTitle = "Submit triage record?",
+  confirmMessage = "This saves the record on this device and syncs automatically when you’re online.",
+  confirmLabel = "Submit Record",
+}: TriageFormProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [pending, setPending] = useState<TriageFormValues | null>(null);
   const {
     control,
     handleSubmit,
@@ -40,7 +59,7 @@ export function TriageForm({ onSubmit, submitting = false, onStepChange }: Triag
   } = useForm<TriageFormValues>({
     resolver: zodResolver(triageFormSchema),
     mode: "onChange",
-    defaultValues: {
+    defaultValues: initialValues ?? {
       patientName: "",
       conditionDescription: "",
       priorityLevel: emptyPriority,
@@ -74,12 +93,17 @@ export function TriageForm({ onSubmit, submitting = false, onStepChange }: Triag
   };
 
   // Quick-symptom tags are merged into the record only on submit — never typed
-  // into the description field.
-  const handleFinalSubmit = (values: TriageFormValues) => {
+  // into the description field. Submitting first opens a confirmation dialog;
+  // the record is only saved once the paramedic confirms.
+  const requestSubmit = handleSubmit((values) => {
     const conditionDescription = symptoms.length
       ? `${values.conditionDescription} — Symptoms: ${symptoms.join(", ")}`
       : values.conditionDescription;
-    return onSubmit({ ...values, conditionDescription });
+    setPending({ ...values, conditionDescription });
+  });
+
+  const confirmSubmit = () => {
+    if (pending) void onSubmit(pending);
   };
 
   if (step === 1) {
@@ -217,11 +241,11 @@ export function TriageForm({ onSubmit, submitting = false, onStepChange }: Triag
 
       <AppButton
         variant="gradient"
-        icon="cloud-upload-outline"
-        label="Save & Submit"
-        onPress={handleSubmit(handleFinalSubmit)}
+        icon={submitIcon}
+        label={submitLabel}
+        onPress={requestSubmit}
         disabled={!isValid}
-        loading={submitting}
+        loading={submitting && pending !== null}
       />
 
       <Pressable accessibilityRole="button" onPress={goBack} className="items-center py-1">
@@ -236,6 +260,19 @@ export function TriageForm({ onSubmit, submitting = false, onStepChange }: Triag
           If offline, this record stays safely queued.
         </Text>
       </View>
+
+      <ConfirmDialog
+        visible={pending !== null}
+        title={confirmTitle}
+        message={confirmMessage}
+        confirmLabel={confirmLabel}
+        cancelLabel="Review again"
+        icon={submitIcon}
+        tone="primary"
+        loading={submitting}
+        onConfirm={confirmSubmit}
+        onCancel={() => setPending(null)}
+      />
     </View>
   );
 }

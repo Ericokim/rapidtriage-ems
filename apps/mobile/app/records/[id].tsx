@@ -93,7 +93,12 @@ export default function RecordDetailsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <ScreenHeader title="Record Details" />
+      <ScreenHeader
+        title="Record Details"
+        rightIcon="create-outline"
+        rightLabel="Edit"
+        onRightPress={() => router.push(`/triage/edit?id=${record.id}`)}
+      />
       <ScreenContainer safeTop={false}>
         {/* Summary card */}
         <Card>

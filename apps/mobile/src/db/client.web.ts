@@ -39,11 +39,20 @@ function createInMemoryTable(): TriageLocalTable {
   };
 }
 
+let table: TriageLocalTable | null = null;
 let repository: TriageLocalRepository | null = null;
+
+/** Low-level table singleton (used for seeding starter data). */
+export function getTriageLocalTable(): TriageLocalTable {
+  if (!table) {
+    table = createInMemoryTable();
+  }
+  return table;
+}
 
 export function getTriageLocalRepository(): TriageLocalRepository {
   if (!repository) {
-    repository = createTriageLocalRepository(createInMemoryTable());
+    repository = createTriageLocalRepository(getTriageLocalTable());
   }
   return repository;
 }

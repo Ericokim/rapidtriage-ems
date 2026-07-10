@@ -60,8 +60,8 @@ export function BottomTabs({ state, navigation }: BottomTabBarProps) {
               onPress={item.onPress}
               className="flex-1 items-center justify-center gap-1"
             >
-              <Ionicons name="add-circle" size={26} color={colors.red600} />
-              <Text className="text-[11px] font-semibold" style={{ color: colors.red600 }}>
+              <Ionicons name="add-circle-outline" size={26} color={colors.slate500} />
+              <Text className="text-[11px] font-semibold" style={{ color: colors.slate500 }}>
                 {item.label}
               </Text>
             </Pressable>

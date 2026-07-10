@@ -9,6 +9,10 @@
     "apps/mobile"
   ],
   "scripts": {
+    "dev-clean": "bash scripts/dev-clean.sh",
+    "predev": "npm run dev-clean",
+    "predev:ios": "npm run dev-clean",
+    "predev:android": "npm run dev-clean",
     "dev": "npm run build:shared && concurrently -k -n shared,api,mobile -c cyan,blue,magenta \"npm run dev:shared\" \"npm run api\" \"npm run mobile\"",
     "dev:ios": "npm run build:shared && concurrently -k -n shared,api,mobile -c cyan,blue,magenta \"npm run dev:shared\" \"npm run api\" \"npm --workspace apps/mobile run ios\"",
     "dev:android": "npm run build:shared && concurrently -k -n shared,api,mobile -c cyan,blue,magenta \"npm run dev:shared\" \"npm run api\" \"npm --workspace apps/mobile run android\"",
