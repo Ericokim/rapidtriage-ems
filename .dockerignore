@@ -1,0 +1,11 @@
+# node_modules are reinstalled inside the image; keep everything else so the
+# npm workspace install can resolve all workspace package.json manifests.
+**/node_modules
+**/dist
+.git
+.expo
+.remember
+docs
+*.log
+.env
+.env.*

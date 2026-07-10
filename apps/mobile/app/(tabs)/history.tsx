@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { TriageRecordCard } from "@/src/components/triage/TriageRecordCard";
+import { AppButton } from "@/src/components/ui/AppButton";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { TabScreen } from "@/src/components/layout/TabScreen";
+import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
 import { useSync } from "@/src/hooks/useSync";
 import { colors } from "@/src/theme/tokens";
 
@@ -36,11 +38,37 @@ function dayLabel(iso: string): string {
   return d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
 }
 
+function CountChip({ icon, tint, label }: { icon: React.ComponentProps<typeof Ionicons>["name"]; tint: string; label: string }) {
+  return (
+    <View className="flex-row items-center gap-1.5">
+      <Ionicons name={icon} size={16} color={tint} />
+      <Text className="text-sm font-semibold" style={{ color: colors.navy950 }}>{label}</Text>
+    </View>
+  );
+}
+
 export default function HistoryScreen() {
-  const { records } = useSync();
+  const { isOnline, recheck } = useNetworkStatus();
+  const { records, isSyncing, syncNow, refresh, lastSyncAt } = useSync();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("All Records");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const online = await recheck();
+      await refresh();
+      if (online) await syncNow(true);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [recheck, refresh, syncNow]);
+
+  const pending = records.filter((r) => r.syncStatus === "pending").length;
+  const failed = records.filter((r) => r.syncStatus === "failed").length;
+  const needsSync = pending + failed;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -72,7 +100,7 @@ export default function HistoryScreen() {
           History
         </Text>
         <Text className="text-base" style={{ color: colors.slate500 }}>
-          View all previously saved triage records.
+          All saved records — pull down to refresh &amp; sync.
         </Text>
       </View>
 
@@ -128,11 +156,38 @@ export default function HistoryScreen() {
   );
 
   return (
-    <TabScreen header={header}>
+    <TabScreen header={header} onRefresh={onRefresh} refreshing={refreshing}>
+      {needsSync > 0 ? (
+        <View
+          className="gap-3 rounded-2xl p-4"
+          style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.slate100 }}
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-4">
+              {pending > 0 ? <CountChip icon="cloud-upload" tint={colors.orange600} label={`${pending} Pending`} /> : null}
+              {failed > 0 ? <CountChip icon="alert-circle" tint={colors.red600} label={`${failed} Failed`} /> : null}
+            </View>
+            <Text className="text-xs" style={{ color: colors.slate400 }}>
+              {lastSyncAt
+                ? `Synced ${new Date(lastSyncAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+                : "Not synced yet"}
+            </Text>
+          </View>
+          <AppButton
+            variant="navy"
+            icon="sync"
+            label={isSyncing ? "Syncing…" : "Sync Now"}
+            loading={isSyncing}
+            disabled={!isOnline}
+            onPress={() => syncNow()}
+          />
+        </View>
+      ) : null}
+
       {groups.length === 0 ? (
         <EmptyState
           title="No records found"
-          message="Try a different search or filter."
+          message="Try a different search or filter, or pull down to refresh."
         />
       ) : (
         groups.map(([label, items]) => (

@@ -4,21 +4,39 @@ RapidTriage EMS is an offline-first paramedic triage intake application built wi
 
 The app allows field paramedics to capture patient triage records instantly, save them safely on the device when offline, and automatically sync them to a PostgreSQL backend when connectivity returns.
 
-## Assessment Context
+## Demo
 
-This project was built as a technical assessment for a Full-stack Developer role.
+<p align="center">
+  <img src="docs/demo.gif" alt="RapidTriage EMS walkthrough" width="300" />
+</p>
 
-The assessment focuses on emergency medical services where field paramedics operate in high-pressure environments with unstable or unavailable network coverage.
+A walkthrough of the full flow — launch → onboarding → dashboard → capture a triage → local save confirmation → records history → record detail → settings. Records are saved to on-device SQLite first; pending records upload automatically the moment connectivity returns, and pull-to-refresh re-checks the connection and drains the queue on demand.
 
-The core requirement is simple:
+> The 60-second Airplane-Mode clip (save offline → reconnect → auto-sync) is best recorded live on a device; see [DEMO.md](DEMO.md) for the exact recording script.
+
+## Screenshots
+
+| Splash | Onboarding | Home |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/01-splash.png" width="230" /> | <img src="docs/screenshots/02-onboarding.png" width="230" /> | <img src="docs/screenshots/03-home.png" width="230" /> |
+| **New Triage** | **Saved Offline** | **History & Sync** |
+| <img src="docs/screenshots/04-new-triage.png" width="230" /> | <img src="docs/screenshots/05-saved-offline.png" width="230" /> | <img src="docs/screenshots/06-history.png" width="230" /> |
+| **Record Details** | **More / Settings** | |
+| <img src="docs/screenshots/07-record-details.png" width="230" /> | <img src="docs/screenshots/08-more.png" width="230" /> | |
+
+## Overview
+
+RapidTriage EMS is built for emergency medical services, where field paramedics work in high-pressure environments with unstable or unavailable network coverage. It lets a responder capture a patient triage record in seconds and guarantees that record is never lost, even with no signal.
+
+The guiding principle is simple:
 
 > A valid triage record must never be lost because of network failure.
 
 ## Product Summary
 
-RapidTriage EMS helps paramedics log critical patient data quickly using a single-screen mobile form. The app saves every valid submission locally first using SQLite, then syncs pending records to the backend when internet connectivity is restored.
+RapidTriage EMS helps paramedics log critical patient data quickly using a fast, thumb-friendly intake form. Every valid submission is saved locally first using SQLite, then pending records sync to the backend automatically when connectivity is restored.
 
-The product is intentionally focused. It does not try to be a full hospital system, dispatch system, or analytics platform. It is a resilient field intake tool built to prove offline-first mobile engineering.
+The product is intentionally focused — it is not a hospital system, dispatch platform, or analytics suite. It is a resilient field intake tool with a deliberately offline-first architecture: splash and onboarding, a home dashboard, a multi-step triage form, full record history with search and sync, record details, and a settings screen.
 
 ## Core Product Rule
 
@@ -28,25 +46,22 @@ The backend is used for synchronization only after local persistence succeeds.
 
 ## Core Features
 
-- Single-screen triage intake form
-- Patient Name field
-- Condition Description field
-- Priority Level selector from 1 to 5
-- Status selector: Pending or In-Transit
-- Inline validation
-- High-visibility color coding for Priority 1 and Priority 2
-- Offline-first local persistence using Expo SQLite
-- Type-safe local SQL access using Drizzle ORM
-- Background sync queue
-- Network reconnect detection using NetInfo
-- App foreground lifecycle sync
-- TanStack Query API mutation layer
-- Express backend API
-- PostgreSQL remote storage
-- Shared Zod validation schemas
-- Shared TypeScript types
-- Unit tests for critical behavior
-- Demo-ready Airplane Mode workflow
+- Animated splash and a 3-step onboarding flow
+- Home dashboard: live online/offline status, intake metrics, recent records
+- Guided two-step triage intake form (Patient Info → Triage Details → review)
+  - Patient Name, Condition Description, Priority Level 1–5, Status (Pending / In-Transit)
+  - Quick-symptom tags, inline validation, field focus states, info tooltips
+- High-visibility hazard color coding for Priority 1 (deep red) and 2 (orange)
+- Offline-first local persistence using Expo SQLite (Drizzle, type-safe SQL)
+- Background sync queue with automatic upload on reconnect (NetInfo) and on
+  app foreground (AppState) — never blocks the UI
+- Smart pull-to-refresh: re-checks connectivity, reloads local data, drains the queue
+- History with search, status filters, date grouping, and inline sync controls
+- Read-only record detail with an activity timeline
+- Settings / More: connection status, working auto-sync toggle, about & help
+- Express + PostgreSQL sync API with an idempotent `POST /api/v1/triage/sync`
+- Shared Zod validation schemas and TypeScript types (one source of truth)
+- 34 unit/integration tests across shared, API, and mobile
 
 ## Final Tech Stack
 
@@ -91,9 +106,6 @@ rapidtriage-ems/
 │   └── api/
 ├── packages/
 │   └── shared/
-├── context/
-├── .claude/
-├── CLAUDE.md
 ├── README.md
 ├── SETUP.md
 ├── ARCHITECTURE.md

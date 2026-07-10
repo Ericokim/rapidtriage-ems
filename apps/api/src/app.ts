@@ -2,46 +2,51 @@ import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import { createTriageController } from "./controllers/triageController";
-import { createTriageRouter } from "./routes/triageRoutes";
-import { createTriageService } from "./services/triageService";
-import type { TriageRepository } from "./db/triageRepository";
-import { errorHandler } from "./middleware/errorHandler";
-import { notFound } from "./middleware/notFound";
-
-export interface AppDependencies {
-  triageRepository: TriageRepository;
-  /** Disable request logging (used by tests to keep output clean). */
-  enableLogging?: boolean;
-}
+import { triageSyncRequestSchema } from "@rapidtriage/shared";
+import type { TriageRepository } from "./db";
 
 /**
- * Build the Express app around an injected repository. The server entrypoint
- * passes the Drizzle repository; tests pass an in-memory one.
+ * Build the Express app around a triage repository. The server passes the
+ * Postgres-backed repository; tests pass an in-memory one.
  */
-export function createApp({
-  triageRepository,
-  enableLogging = true,
-}: AppDependencies): Express {
+export function createApp(
+  repository: TriageRepository,
+  options: { logging?: boolean } = {}
+): Express {
   const app = express();
 
   app.use(helmet());
   app.use(cors());
   app.use(express.json({ limit: "1mb" }));
-  if (enableLogging) {
-    app.use(morgan("dev"));
-  }
+  if (options.logging !== false) app.use(morgan("dev"));
 
   app.get("/health", (_req, res) => {
-    res.status(200).json({ ok: true, service: "rapidtriage-api" });
+    res.json({ ok: true, service: "rapidtriage-api" });
   });
 
-  const triageService = createTriageService(triageRepository);
-  const triageController = createTriageController(triageService);
-  app.use("/api/v1/triage", createTriageRouter(triageController));
+  // The only resource: idempotent triage sync, validated with the shared schema.
+  app.post("/api/v1/triage/sync", async (req, res) => {
+    const parsed = triageSyncRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        ok: false,
+        error: "Invalid triage sync payload",
+        issues: parsed.error.issues,
+      });
+      return;
+    }
+    try {
+      const syncedIds = await repository.upsertRecords(parsed.data.records);
+      res.json({ ok: true, syncedIds });
+    } catch (error) {
+      console.error("Triage sync failed:", error);
+      res.status(500).json({ ok: false, error: "Internal server error" });
+    }
+  });
 
-  app.use(notFound);
-  app.use(errorHandler);
+  app.use((req, res) => {
+    res.status(404).json({ ok: false, error: `Not found: ${req.method} ${req.path}` });
+  });
 
   return app;
 }

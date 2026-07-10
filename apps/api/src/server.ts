@@ -1,18 +1,24 @@
 import "dotenv/config";
+import path from "node:path";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { createApp } from "./app";
-import { loadEnv } from "./config/env";
-import { createDbClient } from "./db/client";
-import { createDrizzleTriageRepository } from "./db/triageRepository";
+import { createDb, createRepository } from "./db";
+import { loadEnv } from "./env";
 
-function start() {
+async function start() {
   const env = loadEnv();
-  const { db } = createDbClient();
-  const triageRepository = createDrizzleTriageRepository(db);
-  const app = createApp({ triageRepository });
+  const { db } = createDb(env.DATABASE_URL);
 
+  // Apply pending migrations on boot so a fresh production database is ready.
+  await migrate(db, { migrationsFolder: path.join(__dirname, "../drizzle") });
+
+  const app = createApp(createRepository(db));
   app.listen(env.PORT, () => {
     console.log(`RapidTriage API running on port ${env.PORT}`);
   });
 }
 
-start();
+start().catch((error) => {
+  console.error("Failed to start RapidTriage API:", error);
+  process.exit(1);
+});

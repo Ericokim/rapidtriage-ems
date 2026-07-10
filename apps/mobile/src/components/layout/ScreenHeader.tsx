@@ -38,7 +38,7 @@ export function ScreenHeader({
           accessibilityRole="button"
           accessibilityLabel="Go back"
           hitSlop={12}
-          onPress={onBack ?? (() => (router.canGoBack() ? router.back() : router.replace("/")))}
+          onPress={onBack ?? (() => (router.canGoBack() ? router.back() : router.replace("/home")))}
           style={{ width: 40 }}
         >
           <Ionicons name="chevron-back" size={26} color={fg} />

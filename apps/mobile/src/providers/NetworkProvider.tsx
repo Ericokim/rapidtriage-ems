@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -9,14 +10,16 @@ import NetInfo, { type NetInfoState } from "@react-native-community/netinfo";
 
 export interface NetworkContextValue {
   isOnline: boolean;
+  /** Force a fresh connectivity check (used by pull-to-refresh). */
+  recheck: () => Promise<boolean>;
 }
 
 export const NetworkContext = createContext<NetworkContextValue>({
   isOnline: true,
+  recheck: async () => true,
 });
 
 function isConnected(state: NetInfoState): boolean {
-  // Treat unknown internet reachability as online to avoid false "offline".
   return Boolean(state.isConnected) && state.isInternetReachable !== false;
 }
 
@@ -32,7 +35,14 @@ export function NetworkProvider({ children }: PropsWithChildren) {
     return () => unsubscribe();
   }, []);
 
-  const value = useMemo(() => ({ isOnline }), [isOnline]);
+  const recheck = useCallback(async () => {
+    const state = await NetInfo.fetch();
+    const online = isConnected(state);
+    setIsOnline(online);
+    return online;
+  }, []);
+
+  const value = useMemo(() => ({ isOnline, recheck }), [isOnline, recheck]);
 
   return (
     <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>

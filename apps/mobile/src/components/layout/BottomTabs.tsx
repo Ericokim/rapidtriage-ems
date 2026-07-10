@@ -24,10 +24,10 @@ export function BottomTabs({ state, navigation }: BottomTabBarProps) {
   const go = (name: string) => navigation.navigate(name);
 
   const items: TabItem[] = [
-    { key: "index", label: "Home", icon: "home", active: current === "index", onPress: () => go("index") },
+    { key: "home", label: "Home", icon: "home", active: current === "home", onPress: () => go("home") },
     { key: "new", label: "New Triage", icon: "add", active: false, isAction: true, onPress: () => router.push("/triage/new") },
-    { key: "queue", label: "Queue", icon: "list", active: current === "queue", onPress: () => go("queue") },
-    { key: "history", label: "History", icon: "time", active: current === "history", onPress: () => go("history") },
+    { key: "history", label: "History", icon: "documents", active: current === "history", onPress: () => go("history") },
+    { key: "more", label: "More", icon: "menu", active: current === "more", onPress: () => go("more") },
   ];
 
   return (

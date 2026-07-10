@@ -1,0 +1,23 @@
+# Render Blueprint — deploys the RapidTriage API + a managed Postgres.
+# Push this repo to GitHub, then in Render: New → Blueprint → pick this repo.
+# Render provisions the database, wires DATABASE_URL, builds, and runs.
+databases:
+  - name: rapidtriage-db
+    databaseName: rapidtriage
+    plan: free
+
+services:
+  - type: web
+    name: rapidtriage-api
+    runtime: node
+    plan: free
+    healthCheckPath: /health
+    buildCommand: npm ci && npm run build:shared && npm --workspace @rapidtriage/api run build
+    startCommand: node apps/api/dist/server.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rapidtriage-db
+          property: connectionString
+      - key: NODE_VERSION
+        value: "20"

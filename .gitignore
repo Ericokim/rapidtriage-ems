@@ -49,5 +49,10 @@ drizzle/
 .idea/
 *.swp
 
-# Local Claude session artifacts
+# Local editor/session artifacts
 .remember/
+
+# Playwright
+test/test-results/
+test/playwright-report/
+test/.playwright/

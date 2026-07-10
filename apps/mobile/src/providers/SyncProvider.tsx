@@ -12,6 +12,7 @@ import { getSyncEngine } from "../features/sync/syncEngineInstance";
 import { useSyncOnForeground } from "../features/sync/useSyncOnForeground";
 import { useSyncOnReconnect } from "../features/sync/useSyncOnReconnect";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
+import { getAutoSync, setAutoSyncPref } from "../lib/prefs";
 
 const PENDING_STATUSES: SyncStatus[] = ["pending", "failed"];
 
@@ -28,9 +29,13 @@ export interface SyncContextValue {
   lastSyncAt: string | null;
   lastError: string | null;
   refresh: () => Promise<void>;
-  syncNow: () => Promise<void>;
+  /** Push pending/failed records. Pass force=true to bypass the stale online check
+   *  (used by pull-to-refresh right after a fresh connectivity check). */
+  syncNow: (force?: boolean) => Promise<void>;
   /** Core rule: save locally first, then sync only if online. */
   submitTriage: (input: TriageFormValues) => Promise<SubmitResult>;
+  autoSync: boolean;
+  setAutoSync: (value: boolean) => void;
 }
 
 export const SyncContext = createContext<SyncContextValue | null>(null);
@@ -44,13 +49,23 @@ export function SyncProvider({ children }: PropsWithChildren) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [autoSync, setAutoSyncState] = useState(true);
+
+  useEffect(() => {
+    void getAutoSync().then(setAutoSyncState);
+  }, []);
+
+  const setAutoSync = useCallback((next: boolean) => {
+    setAutoSyncState(next);
+    void setAutoSyncPref(next);
+  }, []);
 
   const refresh = useCallback(async () => {
     setRecords(await repository.getAllLocalTriageRecords());
   }, [repository]);
 
-  const syncNow = useCallback(async () => {
-    if (!isOnline || engine.isSyncing()) return;
+  const syncNow = useCallback(async (force = false) => {
+    if ((!force && !isOnline) || engine.isSyncing()) return;
     setIsSyncing(true);
     try {
       const result = await engine.run();
@@ -86,10 +101,10 @@ export function SyncProvider({ children }: PropsWithChildren) {
   }, [refresh]);
 
   useSyncOnReconnect(() => {
-    void syncNow();
+    if (autoSync) void syncNow();
   });
   useSyncOnForeground(() => {
-    if (isOnline) void syncNow();
+    if (autoSync && isOnline) void syncNow();
   });
 
   const pendingRecords = useMemo(
@@ -108,6 +123,8 @@ export function SyncProvider({ children }: PropsWithChildren) {
       refresh,
       syncNow,
       submitTriage,
+      autoSync,
+      setAutoSync,
     }),
     [
       records,
@@ -118,6 +135,8 @@ export function SyncProvider({ children }: PropsWithChildren) {
       refresh,
       syncNow,
       submitTriage,
+      autoSync,
+      setAutoSync,
     ]
   );
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../theme/tokens";
 
@@ -7,6 +7,9 @@ interface TabScreenProps {
   /** Static content pinned to the top (does not scroll). */
   header: ReactNode;
   children: ReactNode;
+  /** Enables pull-to-refresh when provided. */
+  onRefresh?: () => void | Promise<void>;
+  refreshing?: boolean;
 }
 
 /** Bottom margin so scrolled content clears the floating tab bar (68 + 12 + gap). */
@@ -14,9 +17,10 @@ export const FLOATING_TAB_CLEARANCE = 110;
 
 /**
  * Tab-screen scaffold: a fixed header that stays put while the body scrolls
- * underneath, with bottom padding for the floating tab bar.
+ * underneath, with bottom padding for the floating tab bar and optional
+ * pull-to-refresh.
  */
-export function TabScreen({ header, children }: TabScreenProps) {
+export function TabScreen({ header, children, onRefresh, refreshing }: TabScreenProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -40,6 +44,16 @@ export function TabScreen({ header, children }: TabScreenProps) {
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={Boolean(refreshing)}
+              onRefresh={onRefresh}
+              tintColor={colors.navy700}
+              colors={[colors.navy700]}
+            />
+          ) : undefined
+        }
       >
         {children}
       </ScrollView>

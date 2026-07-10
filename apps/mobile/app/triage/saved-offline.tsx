@@ -47,7 +47,7 @@ export default function SavedOfflineScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <ScreenHeader title="Saved Offline" onBack={() => router.replace("/")} />
+      <ScreenHeader title="Saved Offline" onBack={() => router.replace("/home")} />
       <ScreenContainer safeTop={false}>
         {/* Illustration */}
         <View className="flex-row items-center justify-center gap-2 pt-4">
@@ -120,7 +120,7 @@ export default function SavedOfflineScreen() {
         />
 
         <View className="gap-3">
-          <AppButton variant="navy" label="View Queue" onPress={() => router.replace("/queue")} />
+          <AppButton variant="navy" label="View Records" onPress={() => router.replace("/history")} />
           <AppButton variant="outline" label="Create Another" onPress={() => router.replace("/triage/new")} />
         </View>
       </ScreenContainer>

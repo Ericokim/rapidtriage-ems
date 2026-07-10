@@ -18,10 +18,12 @@
     "build:shared": "npm --workspace @rapidtriage/shared run build",
     "test": "npm --workspace @rapidtriage/shared run test && npm --workspace apps/api run test && npm --workspace apps/mobile run test",
     "typecheck": "npm --workspace @rapidtriage/shared run typecheck && npm --workspace apps/api run typecheck && npm --workspace apps/mobile run typecheck",
-    "lint": "npm --workspace apps/api run lint && npm --workspace apps/mobile run lint"
+    "lint": "npm --workspace apps/api run lint && npm --workspace apps/mobile run lint",
+    "test:e2e": "playwright test -c test/playwright.config.ts"
   },
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "concurrently": "^9.1.0",
     "eslint": "^9.25.0"
   },
