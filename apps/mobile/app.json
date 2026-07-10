@@ -4,6 +4,7 @@
     "slug": "rapidtriage-ems",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "scheme": "rapidtriage",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -13,14 +14,28 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "package": "com.rapidtriage.ems"
+      "package": "com.rapidtriage.ems",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "web": {
       "output": "static",
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false
