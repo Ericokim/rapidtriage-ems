@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "eas-build-post-install": "cd ../.. && npm run build:shared"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
