@@ -39,9 +39,6 @@ yarn-error.*
 # Testing
 coverage/
 
-# Drizzle
-drizzle/
-
 # macOS
 .DS_Store
 
