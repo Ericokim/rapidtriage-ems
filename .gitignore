@@ -48,6 +48,7 @@ coverage/
 
 # Local editor/session artifacts
 .remember/
+.claude/
 
 # Playwright
 test/test-results/
