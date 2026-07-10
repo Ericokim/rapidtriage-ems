@@ -7,7 +7,8 @@ import {
   type PropsWithChildren,
 } from "react";
 import type { SyncStatus, TriageFormValues } from "@rapidtriage/shared";
-import { getTriageLocalRepository } from "../db/client";
+import { getTriageLocalRepository, getTriageLocalTable } from "../db/client";
+import { seedLocalTriageRecordsIfEmpty } from "../db/seed";
 import { getSyncEngine } from "../features/sync/syncEngineInstance";
 import { useSyncOnForeground } from "../features/sync/useSyncOnForeground";
 import { useSyncOnReconnect } from "../features/sync/useSyncOnReconnect";
@@ -97,7 +98,11 @@ export function SyncProvider({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    void refresh();
+    // Seed starter records on first launch, then load whatever is on-device.
+    void (async () => {
+      await seedLocalTriageRecordsIfEmpty(getTriageLocalTable());
+      await refresh();
+    })();
   }, [refresh]);
 
   useSyncOnReconnect(() => {
