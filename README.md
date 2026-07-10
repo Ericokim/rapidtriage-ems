@@ -10,7 +10,7 @@ Built with React Native and Expo (TypeScript). The backend API and Postgres data
 
 ## Demo — save offline, sync on reconnect
 
-The whole assessment in one run, recorded end to end on a device with no cuts: with **Airplane Mode on**, a paramedic captures and saves a patient; the moment connectivity returns, the record uploads to the backend on its own — no error screen, nothing lost.
+The whole assessment in one run, recorded end to end on a device with no cuts: with **Airplane Mode on**, a paramedic captures and saves a patient; the moment connectivity returns, the record uploads to the backend on its own no error screen, nothing lost.
 
 <p align="center">
   <img src="docs/demo.gif" alt="RapidTriage EMS airplane-mode demo" width="300" />
