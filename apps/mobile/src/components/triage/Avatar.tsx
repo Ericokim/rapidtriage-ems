@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import type { TriagePriority } from "@rapidtriage/shared";
-import { PRIORITY, colors } from "../../theme/tokens";
+import { PRIORITY } from "../../theme/tokens";
 
 interface AvatarProps {
   priority: TriagePriority;
