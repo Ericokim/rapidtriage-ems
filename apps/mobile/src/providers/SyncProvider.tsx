@@ -35,6 +35,8 @@ export interface SyncContextValue {
   syncNow: (force?: boolean) => Promise<void>;
   /** Core rule: save locally first, then sync only if online. */
   submitTriage: (input: TriageFormValues) => Promise<SubmitResult>;
+  /** Edit an existing record; re-queues it for sync and pushes if online. */
+  updateTriage: (id: string, input: TriageFormValues) => Promise<SubmitResult>;
   autoSync: boolean;
   setAutoSync: (value: boolean) => void;
 }
@@ -97,6 +99,19 @@ export function SyncProvider({ children }: PropsWithChildren) {
     [repository, refresh, isOnline, syncNow]
   );
 
+  const updateTriage = useCallback(
+    async (id: string, input: TriageFormValues): Promise<SubmitResult> => {
+      // Same rule as create: persist the edit locally first, then sync if online.
+      const record = await repository.updateLocalTriageRecord(id, input);
+      await refresh();
+      if (isOnline) {
+        void syncNow();
+      }
+      return { record, wasOnline: isOnline };
+    },
+    [repository, refresh, isOnline, syncNow]
+  );
+
   useEffect(() => {
     // Seed starter records on first launch, then load whatever is on-device.
     void (async () => {
@@ -128,6 +143,7 @@ export function SyncProvider({ children }: PropsWithChildren) {
       refresh,
       syncNow,
       submitTriage,
+      updateTriage,
       autoSync,
       setAutoSync,
     }),
@@ -140,6 +156,7 @@ export function SyncProvider({ children }: PropsWithChildren) {
       refresh,
       syncNow,
       submitTriage,
+      updateTriage,
       autoSync,
       setAutoSync,
     ]

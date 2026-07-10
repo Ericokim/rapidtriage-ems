@@ -6,6 +6,8 @@ import type { TriageLocalTable } from "./triageLocalRepository";
 const SEED_FLAG = "rt.seeded_v1";
 
 interface SeedSpec {
+  /** Stable id so re-installs and multiple devices upsert the same backend row. */
+  id: string;
   patientName: string;
   conditionDescription: string;
   priorityLevel: TriagePriority;
@@ -23,6 +25,7 @@ interface SeedSpec {
  */
 const SEEDS: SeedSpec[] = [
   {
+    id: "seed-john-carter",
     patientName: "John Carter",
     conditionDescription: "Crushing chest pain radiating to the left arm, diaphoretic and short of breath. Suspected acute MI.",
     priorityLevel: 1,
@@ -31,6 +34,7 @@ const SEEDS: SeedSpec[] = [
     minutesAgo: 35,
   },
   {
+    id: "seed-maria-gomez",
     patientName: "Maria Gomez",
     conditionDescription: "Severe respiratory distress with audible wheeze, SpO2 88% on room air. History of asthma.",
     priorityLevel: 2,
@@ -39,6 +43,7 @@ const SEEDS: SeedSpec[] = [
     minutesAgo: 90,
   },
   {
+    id: "seed-david-lee",
     patientName: "David Lee",
     conditionDescription: "Fall from ladder, deformed and painful right forearm. Suspected closed fracture, distal pulses intact.",
     priorityLevel: 3,
@@ -47,6 +52,7 @@ const SEEDS: SeedSpec[] = [
     minutesAgo: 150,
   },
   {
+    id: "seed-sarah-johnson",
     patientName: "Sarah Johnson",
     conditionDescription: "Deep laceration to the left palm from broken glass, bleeding controlled with direct pressure.",
     priorityLevel: 3,
@@ -55,6 +61,7 @@ const SEEDS: SeedSpec[] = [
     minutesAgo: 1560,
   },
   {
+    id: "seed-ahmed-khan",
     patientName: "Ahmed Khan",
     conditionDescription: "Localized urticaria after a bee sting, no airway involvement, vitals stable. Monitoring for progression.",
     priorityLevel: 4,
@@ -63,6 +70,7 @@ const SEEDS: SeedSpec[] = [
     minutesAgo: 1620,
   },
   {
+    id: "seed-emily-davis",
     patientName: "Emily Davis",
     conditionDescription: "Minor abrasions to both knees after a bicycle fall, fully alert with stable vitals.",
     priorityLevel: 5,
@@ -90,11 +98,10 @@ export async function seedLocalTriageRecordsIfEmpty(
   }
 
   const nowMs = Date.now();
-  let index = 0;
   for (const spec of SEEDS) {
     const createdAt = new Date(nowMs - spec.minutesAgo * 60_000).toISOString();
     await table.insert({
-      id: `seed-${index++}-${Math.random().toString(36).slice(2, 8)}`,
+      id: spec.id,
       patientName: spec.patientName,
       conditionDescription: spec.conditionDescription,
       priorityLevel: spec.priorityLevel,

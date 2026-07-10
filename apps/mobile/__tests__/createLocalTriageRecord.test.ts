@@ -56,3 +56,39 @@ describe("createLocalTriageRecord", () => {
     expect(pending[0]?.syncStatus).toBe("pending");
   });
 });
+
+describe("updateLocalTriageRecord", () => {
+  it("applies edits and re-queues an already-synced record for sync", async () => {
+    const { table, repository } = buildRepo();
+    const created = await repository.createLocalTriageRecord(validInput);
+    await repository.markRecordSynced(created.id);
+    expect(table.rows.get(created.id)?.syncStatus).toBe("synced");
+
+    const updated = await repository.updateLocalTriageRecord(created.id, {
+      patientName: "John Kamau Jr",
+      conditionDescription: "Stable after treatment",
+      priorityLevel: 4,
+      status: "Pending",
+    });
+
+    expect(updated.patientName).toBe("John Kamau Jr");
+    expect(updated.priorityLevel).toBe(4);
+    expect(updated.status).toBe("Pending");
+    // An edit must reach the backend, so it goes back to the pending queue.
+    expect(updated.syncStatus).toBe("pending");
+    expect(updated.syncedAt).toBeNull();
+    const pending = await repository.getPendingSyncRecords();
+    expect(pending.map((r) => r.id)).toContain(created.id);
+  });
+
+  it("rejects an invalid edit and throws for a missing record", async () => {
+    const { repository } = buildRepo();
+    const created = await repository.createLocalTriageRecord(validInput);
+    await expect(
+      repository.updateLocalTriageRecord(created.id, { ...validInput, patientName: "" })
+    ).rejects.toBeTruthy();
+    await expect(
+      repository.updateLocalTriageRecord("does-not-exist", validInput)
+    ).rejects.toBeTruthy();
+  });
+});

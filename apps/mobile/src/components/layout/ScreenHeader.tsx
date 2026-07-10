@@ -7,6 +7,10 @@ import { colors } from "../../theme/tokens";
 interface ScreenHeaderProps {
   title: string;
   right?: string;
+  /** Optional right-side icon button (e.g. Edit) with its own action. */
+  rightIcon?: React.ComponentProps<typeof Ionicons>["name"];
+  rightLabel?: string;
+  onRightPress?: () => void;
   variant?: "light" | "navy";
   onBack?: () => void;
 }
@@ -15,6 +19,9 @@ interface ScreenHeaderProps {
 export function ScreenHeader({
   title,
   right,
+  rightIcon,
+  rightLabel,
+  onRightPress,
   variant = "light",
   onBack,
 }: ScreenHeaderProps) {
@@ -46,8 +53,26 @@ export function ScreenHeader({
         <Text className="text-xl font-bold" style={{ color: fg }}>
           {title}
         </Text>
-        <View style={{ width: 40, alignItems: "flex-end" }}>
-          {right ? (
+        <View style={{ minWidth: 40, alignItems: "flex-end" }}>
+          {onRightPress ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={rightLabel ?? "Action"}
+              hitSlop={12}
+              onPress={onRightPress}
+              className="flex-row items-center gap-1 rounded-full px-3 py-1.5"
+              style={{ backgroundColor: isNavy ? "rgba(255,255,255,0.12)" : colors.blue50 }}
+            >
+              {rightIcon ? (
+                <Ionicons name={rightIcon} size={16} color={isNavy ? colors.white : colors.navy700} />
+              ) : null}
+              {rightLabel ? (
+                <Text className="text-sm font-semibold" style={{ color: isNavy ? colors.white : colors.navy700 }}>
+                  {rightLabel}
+                </Text>
+              ) : null}
+            </Pressable>
+          ) : right ? (
             <Text className="text-sm font-semibold" style={{ color: isNavy ? colors.white : colors.slate500 }}>
               {right}
             </Text>

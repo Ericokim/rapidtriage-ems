@@ -20,6 +20,7 @@ export default function RootLayout() {
                 <Stack.Screen name="onboarding" />
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="triage/new" />
+                <Stack.Screen name="triage/edit" />
                 <Stack.Screen name="triage/saved-offline" />
                 <Stack.Screen name="records/[id]" />
               </Stack>

@@ -22,6 +22,10 @@ export interface TriageLocalTable {
 
 export interface TriageLocalRepository {
   createLocalTriageRecord(input: TriageFormValues): Promise<LocalTriageRecord>;
+  updateLocalTriageRecord(
+    id: string,
+    input: TriageFormValues
+  ): Promise<LocalTriageRecord>;
   getAllLocalTriageRecords(): Promise<LocalTriageRecord[]>;
   getPendingSyncRecords(): Promise<LocalTriageRecord[]>;
   markRecordSyncing(id: string): Promise<void>;
@@ -70,6 +74,30 @@ export function createTriageLocalRepository(
       };
       await table.insert(record);
       return record;
+    },
+
+    async updateLocalTriageRecord(id, input) {
+      const parsed = triageFormSchema.parse(input);
+      const existing = await table.getById(id);
+      if (!existing) {
+        throw new Error(`Triage record ${id} not found.`);
+      }
+      const timestamp = now();
+      // An edit is a change that must reach the backend, so the record goes
+      // back to "pending" and re-enters the sync queue with a fresh timestamp.
+      const patch: Partial<LocalTriageRecord> = {
+        patientName: parsed.patientName,
+        conditionDescription: parsed.conditionDescription,
+        priorityLevel: parsed.priorityLevel as TriagePriority,
+        status: parsed.status as TriageStatus,
+        syncStatus: "pending",
+        retryCount: 0,
+        lastSyncError: null,
+        updatedAt: timestamp,
+        syncedAt: null,
+      };
+      await table.update(id, patch);
+      return { ...existing, ...patch };
     },
 
     async getAllLocalTriageRecords() {
