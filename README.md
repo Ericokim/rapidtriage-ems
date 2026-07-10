@@ -23,8 +23,8 @@ A quick run through the app: launch and onboarding, the dashboard, capturing a t
 | <img src="docs/screenshots/01-splash.png" width="230" /> | <img src="docs/screenshots/02-onboarding.png" width="230" /> | <img src="docs/screenshots/03-home.png" width="230" /> |
 | **New Triage** | **Saved (offline)** | **History and sync** |
 | <img src="docs/screenshots/04-new-triage.png" width="230" /> | <img src="docs/screenshots/05-saved-offline.png" width="230" /> | <img src="docs/screenshots/06-history.png" width="230" /> |
-| **Record detail** | **Settings** | |
-| <img src="docs/screenshots/07-record-details.png" width="230" /> | <img src="docs/screenshots/08-more.png" width="230" /> | |
+| **Record detail** | **Edit record** | **Settings** |
+| <img src="docs/screenshots/07-record-details.png" width="230" /> | <img src="docs/screenshots/09-edit.png" width="230" /> | <img src="docs/screenshots/08-more.png" width="230" /> |
 
 ## The problem this solves
 
@@ -44,7 +44,11 @@ The intake flow collects the four required fields with validation at every step:
 - **Priority Level** 1 to 5, where 1 is life-threatening. Priority 1 and 2 are colour-coded in deep red and orange so critical cases stand out at a glance
 - **Status**: Pending or In-Transit
 
-The form is a short two-step flow (patient info, then triage details with a review) so a responder can move through it fast with one thumb. There are quick-tap symptom chips, inline errors, focus highlighting, and per-field hints. You cannot submit until priority and status are chosen.
+The form is a short two-step flow (patient info, then triage details with a review) so a responder can move through it fast with one thumb. There are quick-tap symptom chips, inline errors, focus highlighting, and per-field hints. You cannot submit until priority and status are chosen. Submitting raises a confirmation dialog first, so a record is only saved once the responder deliberately confirms it.
+
+Existing records can be edited from their detail screen. An edit reopens the same intake flow pre-filled, and saving re-queues the record for sync so the change reaches the backend the same way a new record does.
+
+On a fresh install the app seeds a handful of realistic starter records (spanning every priority and both statuses) so the dashboard, history, and sync states are populated to explore straight away. They upload to the backend with stable ids, so re-installs and multiple devices converge on the same rows instead of duplicating.
 
 ### The offline-first sync engine
 
@@ -91,7 +95,7 @@ The device generates a local id before it ever syncs. The server stores that as 
 | Production-grade state management | React Context for app state, kept separate from persistence and sync |
 | UI decoupled from persistence and sync | Screens call hooks only; a repository owns SQLite, an engine owns sync |
 | Device lifecycle handling | AppState re-checks and syncs on foreground |
-| Unit tests | 34 tests across shared validation, the API, and the mobile logic and form |
+| Unit tests | 37 tests across shared validation, the API, and the mobile logic, form, edit and confirm flows |
 | Public GitHub repo | https://github.com/Ericokim/rapidtriage-ems |
 | Backend (a mock was allowed) | A real Express + Postgres API, deployed live on Render |
 
@@ -169,7 +173,7 @@ Metro serves the JavaScript; the app itself runs in a simulator, emulator, or Ex
 ## Testing
 
 ```bash
-npm test              # all 34 unit and integration tests
+npm test              # all 37 unit and integration tests
 npm run typecheck     # all workspaces
 npm run lint
 
