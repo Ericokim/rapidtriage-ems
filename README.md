@@ -8,7 +8,7 @@ Built with React Native and Expo (TypeScript). The backend API and Postgres data
 - **Live API:** https://rapidtriage-api.onrender.com/health
 - **Android APK:** [download from the v1.0.0 release](https://github.com/Ericokim/rapidtriage-ems/releases/download/v1.0.0/rapidtriage-ems-v1.0.0.apk) (sideload on an Android device; it talks to the live API and works offline)
 
-## Demo — save offline, sync on reconnect
+## Demo — Save offline, sync on reconnect
 
 The whole assessment in one run, recorded end to end on a device with no cuts: with **Airplane Mode on**, a paramedic captures and saves a patient; the moment connectivity returns, the record uploads to the backend on its own no error screen, nothing lost.
 
