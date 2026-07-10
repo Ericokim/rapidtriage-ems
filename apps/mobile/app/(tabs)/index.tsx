@@ -6,7 +6,7 @@ import { MetricSummaryCard, type Metric } from "@/src/components/triage/MetricSu
 import { TriageRecordCard } from "@/src/components/triage/TriageRecordCard";
 import { AppHeader } from "@/src/components/ui/AppHeader";
 import { EmptyState } from "@/src/components/ui/EmptyState";
-import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { TabScreen } from "@/src/components/layout/TabScreen";
 import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
 import { useSync } from "@/src/hooks/useSync";
 import { colors } from "@/src/theme/tokens";
@@ -28,9 +28,7 @@ export default function HomeScreen() {
   const recent = records.slice(0, 3);
 
   return (
-    <ScreenContainer>
-      <AppHeader isOnline={isOnline} />
-
+    <TabScreen header={<AppHeader isOnline={isOnline} />}>
       <View className="gap-1">
         <Text className="text-4xl font-extrabold" style={{ color: colors.navy950 }}>
           Ready for intake
@@ -94,6 +92,6 @@ export default function HomeScreen() {
           ))}
         </View>
       )}
-    </ScreenContainer>
+    </TabScreen>
   );
 }

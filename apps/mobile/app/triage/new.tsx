@@ -5,14 +5,13 @@ import type { TriageFormValues } from "@rapidtriage/shared";
 import { TriageForm } from "@/src/components/triage/TriageForm";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
-import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
 import { useSync } from "@/src/hooks/useSync";
 import { colors } from "@/src/theme/tokens";
 
 export default function NewTriageScreen() {
   const { submitTriage } = useSync();
-  const { isOnline } = useNetworkStatus();
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
 
   async function handleSubmit(values: TriageFormValues) {
     setSubmitting(true);
@@ -29,12 +28,26 @@ export default function NewTriageScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <ScreenHeader title="New Triage" />
+      <ScreenHeader title="New Triage" right={`${step} of 2`} />
+
+      <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
+        <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.slate200 }}>
+          <View
+            style={{
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: colors.navy950,
+              width: step === 1 ? "50%" : "100%",
+            }}
+          />
+        </View>
+      </View>
+
       <ScreenContainer safeTop={false}>
         <TriageForm
           onSubmit={handleSubmit}
           submitting={submitting}
-          isOnline={isOnline}
+          onStepChange={setStep}
         />
       </ScreenContainer>
     </View>

@@ -1,55 +1,73 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import { TRIAGE_STATUSES, type TriageStatus } from "@rapidtriage/shared";
+import { FieldLabel } from "../ui/FieldLabel";
 import { colors } from "../../theme/tokens";
 
 interface StatusSegmentedControlProps {
   value: TriageStatus | null;
   onChange: (status: TriageStatus) => void;
   error?: string;
+  info?: string;
 }
 
-const ICONS: Record<TriageStatus, React.ComponentProps<typeof Ionicons>["name"]> = {
-  Pending: "time-outline",
-  "In-Transit": "bus-outline",
+const META: Record<
+  TriageStatus,
+  { icon: React.ComponentProps<typeof Ionicons>["name"]; tint: string; hint: string }
+> = {
+  Pending: { icon: "time", tint: colors.amber500, hint: "Awaiting transport" },
+  "In-Transit": { icon: "bus", tint: colors.blue600, hint: "Being transported" },
 };
 
-/** Two-option segmented control; selected segment is solid navy. */
+/** Two selectable status cards; the selected one is solid navy with a check. */
 export function StatusSegmentedControl({
   value,
   onChange,
   error,
+  info,
 }: StatusSegmentedControlProps) {
   return (
     <View className="gap-2">
-      <Text className="text-base font-bold" style={{ color: colors.navy950 }}>
-        Status <Text style={{ color: colors.red600 }}>*</Text>
-      </Text>
-      <View
-        className="flex-row gap-1 rounded-2xl p-1"
-        style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.slate200 }}
-      >
+      <FieldLabel label="Status" required info={info} />
+      <View className="flex-row gap-3">
         {TRIAGE_STATUSES.map((status) => {
+          const meta = META[status];
           const selected = value === status;
           return (
             <Pressable
               key={status}
               accessibilityRole="button"
               accessibilityState={{ selected }}
+              accessibilityLabel={status}
               onPress={() => onChange(status)}
-              className="h-12 flex-1 flex-row items-center justify-center gap-2 rounded-xl"
-              style={{ backgroundColor: selected ? colors.navy950 : "transparent" }}
+              className="flex-1 items-center gap-1.5 rounded-2xl px-3 py-4"
+              style={{
+                borderWidth: 2,
+                borderColor: selected ? colors.navy950 : colors.slate200,
+                backgroundColor: selected ? colors.navy950 : colors.white,
+              }}
             >
-              <Ionicons
-                name={ICONS[status]}
-                size={18}
-                color={selected ? colors.white : colors.slate600}
-              />
+              <View className="flex-row items-center gap-1.5">
+                <Ionicons
+                  name={meta.icon}
+                  size={20}
+                  color={selected ? colors.white : meta.tint}
+                />
+                <Text
+                  className="text-base font-bold"
+                  style={{ color: selected ? colors.white : colors.navy950 }}
+                >
+                  {status}
+                </Text>
+                {selected ? (
+                  <Ionicons name="checkmark-circle" size={16} color={colors.white} />
+                ) : null}
+              </View>
               <Text
-                className="text-base font-semibold"
-                style={{ color: selected ? colors.white : colors.slate700 }}
+                className="text-xs"
+                style={{ color: selected ? "rgba(255,255,255,0.8)" : colors.slate500 }}
               >
-                {status}
+                {meta.hint}
               </Text>
             </Pressable>
           );

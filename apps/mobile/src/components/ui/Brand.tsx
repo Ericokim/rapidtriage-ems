@@ -1,38 +1,16 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
-import { colors } from "../../theme/tokens";
+import { Image } from "react-native";
 
-/** Star-of-life logo mark in a navy rounded square. */
-export function LogoMark({ size = 44 }: { size?: number }) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: 12,
-        backgroundColor: colors.navy950,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Ionicons name="medical" size={size * 0.55} color={colors.white} />
-    </View>
-  );
-}
+const LOGO = require("../../../assets/images/rapidtriage-logo.png");
 
-/** "RapidTriage EMS" wordmark + subtitle. */
-export function Brand({ subtitle = "Emergency intake" }: { subtitle?: string }) {
+/** RapidTriage EMS horizontal logo (star-of-life + wordmark + "Emergency intake"). */
+export function Brand({ height = 38 }: { height?: number; subtitle?: string }) {
+  // Logo asset aspect ratio ≈ 1941 / 371.
   return (
-    <View className="flex-row items-center gap-3">
-      <LogoMark />
-      <View>
-        <Text className="text-lg font-extrabold" style={{ color: colors.navy950 }}>
-          Rapid<Text style={{ color: colors.red600 }}>Triage</Text> EMS
-        </Text>
-        <Text className="text-xs" style={{ color: colors.slate500 }}>
-          {subtitle}
-        </Text>
-      </View>
-    </View>
+    <Image
+      source={LOGO}
+      resizeMode="contain"
+      style={{ height, width: height * (1941 / 371) }}
+      accessibilityLabel="RapidTriage EMS"
+    />
   );
 }

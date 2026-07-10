@@ -6,7 +6,7 @@ import { TriageRecordCard } from "@/src/components/triage/TriageRecordCard";
 import { AppButton } from "@/src/components/ui/AppButton";
 import { AppHeader } from "@/src/components/ui/AppHeader";
 import { EmptyState } from "@/src/components/ui/EmptyState";
-import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { TabScreen } from "@/src/components/layout/TabScreen";
 import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
 import { useSync } from "@/src/hooks/useSync";
 import { colors } from "@/src/theme/tokens";
@@ -34,9 +34,7 @@ export default function QueueScreen() {
   const list = tab === "pending" ? pending : failed;
 
   return (
-    <ScreenContainer>
-      <AppHeader isOnline={isOnline} />
-
+    <TabScreen header={<AppHeader isOnline={isOnline} />}>
       <View className="gap-1">
         <Text className="text-4xl font-extrabold" style={{ color: colors.navy950 }}>
           Queue
@@ -109,6 +107,6 @@ export default function QueueScreen() {
             : "No sync attempts yet"}
         </Text>
       </View>
-    </ScreenContainer>
+    </TabScreen>
   );
 }

@@ -4,7 +4,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { TriageRecordCard } from "@/src/components/triage/TriageRecordCard";
 import { EmptyState } from "@/src/components/ui/EmptyState";
-import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { TabScreen } from "@/src/components/layout/TabScreen";
 import { useSync } from "@/src/hooks/useSync";
 import { colors } from "@/src/theme/tokens";
 
@@ -40,6 +40,7 @@ export default function HistoryScreen() {
   const { records } = useSync();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("All Records");
+  const [searchFocused, setSearchFocused] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -64,8 +65,8 @@ export default function HistoryScreen() {
     return [...map.entries()];
   }, [filtered]);
 
-  return (
-    <ScreenContainer>
+  const header = (
+    <View className="gap-3">
       <View className="gap-1">
         <Text className="text-4xl font-extrabold" style={{ color: colors.navy950 }}>
           History
@@ -77,12 +78,19 @@ export default function HistoryScreen() {
 
       <View
         className="flex-row items-center gap-2 rounded-2xl px-4"
-        style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.slate200, minHeight: 52 }}
+        style={{
+          backgroundColor: searchFocused ? colors.blue50 : colors.white,
+          borderWidth: searchFocused ? 2 : 1,
+          borderColor: searchFocused ? colors.navy700 : colors.slate200,
+          minHeight: 52,
+        }}
       >
-        <Ionicons name="search" size={20} color={colors.slate400} />
+        <Ionicons name="search" size={20} color={searchFocused ? colors.navy700 : colors.slate400} />
         <TextInput
           value={query}
           onChangeText={setQuery}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
           placeholder="Search records..."
           placeholderTextColor={colors.slate400}
           className="flex-1 text-base"
@@ -116,7 +124,11 @@ export default function HistoryScreen() {
           );
         })}
       </View>
+    </View>
+  );
 
+  return (
+    <TabScreen header={header}>
       {groups.length === 0 ? (
         <EmptyState
           title="No records found"
@@ -138,6 +150,6 @@ export default function HistoryScreen() {
           </View>
         ))
       )}
-    </ScreenContainer>
+    </TabScreen>
   );
 }

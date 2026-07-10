@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { Text, TextInput, View, type TextInputProps } from "react-native";
+import { FieldLabel } from "./FieldLabel";
 import { colors } from "../../theme/tokens";
+
+type FocusHandler = NonNullable<TextInputProps["onFocus"]>;
+type BlurHandler = NonNullable<TextInputProps["onBlur"]>;
 
 interface AppTextAreaProps extends TextInputProps {
   label: string;
   required?: boolean;
   error?: string;
   helper?: string;
+  info?: string;
   maxLength?: number;
 }
 
@@ -14,23 +20,40 @@ export function AppTextArea({
   required,
   error,
   helper,
+  info,
   maxLength = 500,
   value,
+  onFocus,
+  onBlur,
   ...props
 }: AppTextAreaProps) {
+  const [focused, setFocused] = useState(false);
   const count = value?.length ?? 0;
+
+  const handleFocus: FocusHandler = (e) => {
+    setFocused(true);
+    onFocus?.(e);
+  };
+  const handleBlur: BlurHandler = (e) => {
+    setFocused(false);
+    onBlur?.(e);
+  };
+
+  const borderColor = error
+    ? colors.red500
+    : focused
+      ? colors.navy700
+      : colors.slate200;
+
   return (
     <View className="gap-2">
-      <Text className="text-base font-bold" style={{ color: colors.navy950 }}>
-        {label}
-        {required ? <Text style={{ color: colors.red600 }}> *</Text> : null}
-      </Text>
+      <FieldLabel label={label} required={required} info={info} />
       <View
         className="rounded-2xl px-4 pb-2 pt-3"
         style={{
-          backgroundColor: colors.white,
-          borderWidth: 1,
-          borderColor: error ? colors.red500 : colors.slate200,
+          backgroundColor: focused ? colors.blue50 : colors.white,
+          borderWidth: focused ? 2 : 1,
+          borderColor,
           minHeight: 130,
         }}
       >
@@ -42,6 +65,8 @@ export function AppTextArea({
           value={value}
           className="flex-1 text-base"
           style={{ color: colors.navy950, minHeight: 90 }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           {...props}
         />
         <Text className="self-end text-xs" style={{ color: colors.slate400 }}>

@@ -69,7 +69,7 @@ export default function RecordDetailsScreen() {
   if (!record) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.white }}>
-        <ScreenHeader title="Record Details" variant="navy" />
+        <ScreenHeader title="Record Details" />
         <ScreenContainer safeTop={false}>
           <Text style={{ color: colors.slate500 }}>Record not found.</Text>
         </ScreenContainer>
@@ -92,8 +92,8 @@ export default function RecordDetailsScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.navy950 }}>
-      <ScreenHeader title="Record Details" variant="navy" />
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <ScreenHeader title="Record Details" />
       <ScreenContainer safeTop={false}>
         {/* Summary card */}
         <Card>
