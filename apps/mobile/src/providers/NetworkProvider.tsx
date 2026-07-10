@@ -7,6 +7,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import NetInfo, { type NetInfoState } from "@react-native-community/netinfo";
+import { API_BASE_URL } from "../api/apiClient";
 
 export interface NetworkContextValue {
   isOnline: boolean;
@@ -36,11 +37,31 @@ export function NetworkProvider({ children }: PropsWithChildren) {
   }, []);
 
   const recheck = useCallback(async () => {
+    // NetInfo can report stale connectivity on simulators and right after a
+    // reconnect, so do a definitive check by actually reaching the API. If that
+    // succeeds we are online no matter what NetInfo thinks.
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`${API_BASE_URL}/health`, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        setIsOnline(true);
+        return true;
+      }
+    } catch {
+      // fall through to NetInfo
+    }
     const state = await NetInfo.fetch();
     const online = isConnected(state);
     setIsOnline(online);
     return online;
   }, []);
+
+  // Definitive check once on mount so the status is right from the first render.
+  useEffect(() => {
+    void recheck();
+  }, [recheck]);
 
   const value = useMemo(() => ({ isOnline, recheck }), [isOnline, recheck]);
 

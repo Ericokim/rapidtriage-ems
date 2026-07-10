@@ -96,7 +96,7 @@ export default function HistoryScreen() {
   const header = (
     <View className="gap-3">
       <View className="gap-1">
-        <Text className="text-4xl font-extrabold" style={{ color: colors.navy950 }}>
+        <Text className="text-3xl font-bold" style={{ color: colors.navy950 }}>
           History
         </Text>
         <Text className="text-base" style={{ color: colors.slate500 }}>

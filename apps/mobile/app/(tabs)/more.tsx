@@ -83,7 +83,7 @@ export default function MoreScreen() {
   return (
     <TabScreen
       header={
-        <Text className="text-4xl font-extrabold" style={{ color: colors.navy950 }}>
+        <Text className="text-3xl font-bold" style={{ color: colors.navy950 }}>
           More
         </Text>
       }

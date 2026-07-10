@@ -48,7 +48,7 @@ export default function HomeScreen() {
       refreshing={refreshing}
     >
       <View className="gap-1">
-        <Text className="text-4xl font-extrabold" style={{ color: colors.navy950 }}>
+        <Text className="text-3xl font-bold" style={{ color: colors.navy950 }}>
           Ready for intake
         </Text>
         <Text className="text-base" style={{ color: colors.slate500 }}>

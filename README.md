@@ -217,6 +217,3 @@ Nothing secret is committed. `DATABASE_URL` lives only in the host's environment
 - **A real backend instead of a mock.** The brief allowed a mock repository, but a deployed Express and Postgres service proves the sync path end to end against a live database.
 - **A two-step form.** The intake is split into patient info and triage details with a review, which keeps each screen short and thumb-friendly under pressure while still capturing everything in one continuous flow.
 
-## Out of scope, on purpose
-
-No authentication, maps, file uploads, or admin dashboard. The backend is deliberately thin: one resource, one endpoint, one job, which is to receive synced triage records safely.

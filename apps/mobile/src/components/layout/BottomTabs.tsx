@@ -58,13 +58,12 @@ export function BottomTabs({ state, navigation }: BottomTabBarProps) {
               accessibilityRole="button"
               accessibilityLabel={item.label}
               onPress={item.onPress}
-              className="flex-1 items-center justify-center"
+              className="flex-1 items-center justify-center gap-1"
             >
-              <View
-                style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: colors.navy950, alignItems: "center", justifyContent: "center", ...shadows.soft }}
-              >
-                <Ionicons name="add" size={26} color={colors.white} />
-              </View>
+              <Ionicons name="add-circle" size={26} color={colors.red600} />
+              <Text className="text-[11px] font-semibold" style={{ color: colors.red600 }}>
+                {item.label}
+              </Text>
             </Pressable>
           );
         }
