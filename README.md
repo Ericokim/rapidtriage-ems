@@ -1,24 +1,78 @@
-# RapidTriage EMS
+<div align="center">
 
-A resilient, offline-first triage intake app for field paramedics. It lets a responder capture a patient record in a few taps and guarantees that record survives even with no signal, then syncs to the backend on its own the moment the phone is back online.
+<img src="docs/logo.png" alt="RapidTriage EMS" width="440" />
 
-Built with React Native and Expo (TypeScript). The backend API and Postgres database are deployed and running on Render.
+### Offline-first triage intake for field paramedics
 
-- **Repository:** https://github.com/Ericokim/rapidtriage-ems
-- **Live API:** https://rapidtriage-api.onrender.com/health
-- **Android APK:** [download from the v1.0.0 release](https://github.com/Ericokim/rapidtriage-ems/releases/download/v1.0.0/rapidtriage-ems-v1.0.0.apk) (sideload on an Android device; it talks to the live API and works offline)
+Capture a patient in seconds, keep the record safe with no signal, and sync it automatically the moment the phone is back online.
 
-## Demo — save offline, sync on reconnect
+<p>
+  <img alt="React Native" src="https://img.shields.io/badge/React_Native-0.81-61DAFB?logo=react&logoColor=white" />
+  <img alt="Expo SDK 54" src="https://img.shields.io/badge/Expo-SDK_54-000020?logo=expo&logoColor=white" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" />
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Drizzle_ORM-4169E1?logo=postgresql&logoColor=white" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-37_passing-3fb950" />
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue" />
+</p>
 
-The whole assessment in one run, recorded end to end on a device with no cuts: with **Airplane Mode on**, a paramedic captures and saves a patient; the moment connectivity returns, the record uploads to the backend on its own — no error screen, nothing lost.
+<p>
+  <a href="https://github.com/Ericokim/rapidtriage-ems/releases/download/v1.0.0/rapidtriage-ems-v1.0.0.apk"><b>Download APK</b></a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://rapidtriage-api.onrender.com/health"><b>Live API</b></a>
+  &nbsp;&middot;&nbsp;
+  <a href="#demo"><b>Demo</b></a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://github.com/Ericokim/rapidtriage-ems"><b>Repository</b></a>
+</p>
+
+</div>
+
+<br />
+
+Built with React Native and Expo (TypeScript). The backend API and PostgreSQL database are deployed and running on Render. Every design choice follows one rule: a valid triage record must never be lost to a network failure.
+
+## Demo
+
+The whole assessment in one run, recorded end to end on a device with no cuts. With Airplane Mode on, a paramedic captures and saves a patient. The moment connectivity returns, the record uploads to the backend on its own, with no error screen and nothing lost.
 
 <p align="center">
   <img src="docs/demo.gif" alt="RapidTriage EMS airplane-mode demo" width="300" />
 </p>
 
-What the recording shows: online dashboard → turn on **Airplane Mode** (status flips to Offline) → create a Priority 2 patient and confirm → *"Triage saved safely — queued"* with no error → turn **Airplane Mode off** → the queued record auto-syncs and turns green (**Synced**). Pulling down to refresh re-checks connectivity and drains the queue on demand.
+Online dashboard, turn on Airplane Mode (status flips to Offline), create a Priority 2 patient and confirm, see "Triage saved safely, queued" with no error, turn Airplane Mode off, and the queued record auto-syncs and turns green (Synced). Pulling down to refresh re-checks connectivity and drains the queue on demand.
+
+## Highlights
+
+- **Offline-first by design.** Every record is validated and written to on-device SQLite before any network call, then confirmed instantly. Offline records queue quietly with no error screen.
+- **Automatic background sync.** A sync engine drains the queue on reconnect, on foreground, and on pull to refresh, with automatic retries and a concurrency guard. It never blocks the UI.
+- **Priority-aware triage.** Priority 1 (Critical) and 2 (Severe) are colour-coded in deep red and orange, so critical cases stand out at a glance.
+- **Edit and confirm.** Records can be edited from their detail screen, and every submission is confirmed through an app-styled dialog before it is saved.
+- **Seeded starter data.** A fresh install comes populated with realistic sample records, so the dashboard and history are worth exploring right away.
+- **Real backend.** A live Express and PostgreSQL API on Render, sharing one Zod schema with the app so the two sides can never drift.
+
+## Table of contents
+
+1. [Demo](#demo)
+2. [Highlights](#highlights)
+3. [Screenshots](#screenshots)
+4. [The problem this solves](#the-problem-this-solves)
+5. [How it works](#how-it-works)
+6. [Meeting the assessment requirements](#meeting-the-assessment-requirements)
+7. [Architecture](#architecture)
+8. [Tech stack](#tech-stack)
+9. [Project structure](#project-structure)
+10. [Running it locally](#running-it-locally)
+11. [Testing](#testing)
+12. [Deployment](#deployment)
+13. [Design decisions and trade-offs](#design-decisions-and-trade-offs)
+14. [License](#license)
 
 ## Screenshots
+
+<details>
+<summary><b>Open the gallery</b> (splash, onboarding, dashboard, intake, offline save, history, detail, edit, settings)</summary>
+
+<br />
 
 | Splash | Onboarding | Home |
 | :---: | :---: | :---: |
@@ -27,6 +81,8 @@ What the recording shows: online dashboard → turn on **Airplane Mode** (status
 | <img src="docs/screenshots/04-new-triage.png" width="230" /> | <img src="docs/screenshots/05-saved-offline.png" width="230" /> | <img src="docs/screenshots/06-history.png" width="230" /> |
 | **Record detail** | **Edit record** | **Settings** |
 | <img src="docs/screenshots/07-record-details.png" width="230" /> | <img src="docs/screenshots/09-edit.png" width="230" /> | <img src="docs/screenshots/08-more.png" width="230" /> |
+
+</details>
 
 ## The problem this solves
 
@@ -42,9 +98,9 @@ Every design choice follows from that. The device is the source of truth while a
 
 The intake flow collects the four required fields with validation at every step:
 
-- **Patient Name** and **Condition Description** (cannot be blank)
-- **Priority Level** 1 to 5, where 1 is life-threatening. Priority 1 and 2 are colour-coded in deep red and orange so critical cases stand out at a glance
-- **Status**: Pending or In-Transit
+- **Patient Name** and **Condition Description**, which cannot be blank.
+- **Priority Level** 1 to 5, where 1 is life-threatening. Priority 1 and 2 are colour-coded in deep red and orange so critical cases stand out at a glance.
+- **Status**, either Pending or In-Transit.
 
 The form is a short two-step flow (patient info, then triage details with a review) so a responder can move through it fast with one thumb. There are quick-tap symptom chips, inline errors, focus highlighting, and per-field hints. You cannot submit until priority and status are chosen. Submitting raises a confirmation dialog first, so a record is only saved once the responder deliberately confirms it.
 
@@ -59,7 +115,7 @@ This is the heart of the app. Submitting never talks to the network first.
 1. The record is validated with a shared Zod schema.
 2. It is written to on-device SQLite immediately and marked `pending`. This happens before any API call, so a dropped connection can never lose it.
 3. The UI confirms the save right away. If the phone is offline, the record simply stays queued and the confirmation says so, calmly, with no error screen.
-4. When the device is online, a background sync worker picks up the pending records, marks them `syncing`, and batch-uploads them to the API. Successful ones become `synced`; failures stay on the device as `failed` and retry later. Nothing is ever deleted.
+4. When the device is online, a background sync worker picks up the pending records, marks them `syncing`, and batch-uploads them to the API. Successful ones become `synced`. Failures stay on the device as `failed` and retry later. Nothing is ever deleted.
 
 The worker is triggered three ways, and it never blocks the interface:
 
@@ -99,7 +155,7 @@ The device generates a local id before it ever syncs. The server stores that as 
 | Device lifecycle handling | AppState re-checks and syncs on foreground |
 | Unit tests | 37 tests across shared validation, the API, and the mobile logic, form, edit and confirm flows |
 | Public GitHub repo | https://github.com/Ericokim/rapidtriage-ems |
-| Backend (a mock was allowed) | A real Express + Postgres API, deployed live on Render |
+| Backend (a mock was allowed) | A real Express and Postgres API, deployed live on Render |
 
 ## Architecture
 
@@ -110,9 +166,9 @@ UI screens
   -> hooks (useSync, useNetworkStatus)
   -> SyncProvider (React Context: records, online state, submit, sync)
   -> triage repository (all SQLite reads and writes)  |  sync engine (queue, retries, upload)
-  -> shared Zod schema + types (used by both app and API)
+  -> shared Zod schema and types (used by both app and API)
   -> Express API
-  -> Postgres
+  -> PostgreSQL
 ```
 
 - **The UI never touches SQL or the network.** Screens render data and call hooks. That is the entire contract.
@@ -120,17 +176,16 @@ UI screens
 - **The sync engine owns the queue.** It reads pending and failed records, drives the status transitions, calls the API, and guards against concurrent runs. It has no idea what a screen looks like.
 - **The shared package owns the contract.** One Zod schema and one set of types validate both the mobile form and the API request, so the two sides can never drift.
 
-Both databases are SQL. SQLite locally, Postgres remotely, Drizzle for type-safe access on both. Keeping the same shape end to end makes the whole thing easy to reason about.
+Both databases are SQL. SQLite locally, PostgreSQL remotely, Drizzle for type-safe access on both. Keeping the same shape end to end makes the whole thing easy to reason about.
 
 ## Tech stack
 
-**Mobile:** React Native, Expo (SDK 54), Expo Router, TypeScript, NativeWind, Expo SQLite, Drizzle ORM, TanStack Query, React Hook Form, Zod, NetInfo, React Context.
-
-**Backend:** Node, Express, PostgreSQL, Drizzle ORM, Zod.
-
-**Shared:** TypeScript types, Zod schemas, and triage constants used by both sides.
-
-**Testing:** Jest and React Native Testing Library for units, Supertest for the API, Playwright for end-to-end on the web build.
+| Layer | Technologies |
+| --- | --- |
+| Mobile | React Native, Expo (SDK 54), Expo Router, TypeScript, NativeWind, Expo SQLite, Drizzle ORM, TanStack Query, React Hook Form, Zod, NetInfo, React Context |
+| Backend | Node, Express, PostgreSQL, Drizzle ORM, Zod |
+| Shared | TypeScript types, Zod schemas, and triage constants used by both sides |
+| Testing | Jest and React Native Testing Library for units, Supertest for the API, Playwright for end-to-end on the web build |
 
 ## Project structure
 
@@ -138,12 +193,12 @@ Both databases are SQL. SQLite locally, Postgres remotely, Drizzle for type-safe
 rapidtriage-ems/
   apps/
     mobile/            Expo app (screens in app/, logic in src/)
-    api/               Express + Postgres sync API (4 source files)
+    api/               Express and Postgres sync API
   packages/
     shared/            Zod schemas, types, constants
   test/                Playwright end-to-end suite
   docs/                screenshots and demo gif
-  render.yaml          Render blueprint (API + Postgres)
+  render.yaml          Render blueprint (API and Postgres)
   Dockerfile           container build for the API
 ```
 
@@ -165,9 +220,9 @@ npm --workspace apps/api run db:migrate
 Then start everything with one command:
 
 ```bash
-npm run dev:ios       # shared watcher + API + Expo, opens the iOS simulator
+npm run dev:ios       # shared watcher, API, and Expo; opens the iOS simulator
 npm run dev:android   # same, Android emulator
-npm run dev           # bundler + API only, open a device yourself
+npm run dev           # bundler and API only; open a device yourself
 ```
 
 Metro serves the JavaScript; the app itself runs in a simulator, emulator, or Expo Go, not a browser. On a physical device, point `EXPO_PUBLIC_API_URL` at your machine's LAN IP instead of localhost.
@@ -184,22 +239,14 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Unit tests live next to the code they cover so each runs in its right environment: the mobile suite under `jest-expo`, the API under node with Supertest, the shared schema under ts-jest. The Playwright suite in `test/` walks the full capture flow. See `test/README.md` for the breakdown.
-
-## The demo the assessment asks for
-
-The short walkthrough is the GIF at the top. To record the required 60-second Airplane-Mode clip:
-
-1. Open the app, show the Online status on the home header.
-2. Turn on Airplane Mode.
-3. Create a triage (John Kamau, chest pain, Priority 1, In-Transit) and submit.
-4. Show the "saved offline" confirmation and the pending record in History.
-5. Turn Airplane Mode off.
-6. Watch the record flip to Synced on its own, with the UI still responsive.
+Unit tests live next to the code they cover so each runs in its right environment: the mobile suite under `jest-expo`, the API under Node with Supertest, the shared schema under ts-jest. The Playwright suite in `test/` walks the full capture flow. See `test/README.md` for the breakdown.
 
 ## Deployment
 
-The backend runs on Render and the app is built with EAS.
+<details>
+<summary><b>Backend on Render, mobile with EAS</b></summary>
+
+<br />
 
 **API and database.** The `render.yaml` blueprint provisions a Postgres database and the web service, wires `DATABASE_URL`, builds the API, and runs it. The server applies its Drizzle migrations on boot, so a fresh database is ready with no manual step. Push to GitHub, then in Render pick New, Blueprint, and this repo. The only environment variable the API needs is `DATABASE_URL`; the host provides `PORT`.
 
@@ -210,16 +257,21 @@ npm install -g eas-cli
 eas login
 cd apps/mobile
 eas init
-eas build -p android --profile preview   # produces a shareable APK link
+eas build -p android --profile preview   # produces a shareable APK
 ```
 
 Nothing secret is committed. `DATABASE_URL` lives only in the host's environment, and `EXPO_PUBLIC_API_URL` is public by design since it is baked into the client.
 
-## Decisions and trade-offs
+</details>
 
-- **SQLite locally, Postgres remotely.** A triage record is structured and relational, so SQL fits better than a document store, and keeping the same shape on both ends keeps the mental model simple.
+## Design decisions and trade-offs
+
+- **SQLite locally, PostgreSQL remotely.** A triage record is structured and relational, so SQL fits better than a document store, and keeping the same shape on both ends keeps the mental model simple.
 - **Drizzle on both sides.** Type-safe SQL without a heavy ORM, and it works against Expo SQLite and Postgres.
 - **Context over Redux.** The durable data already lives in SQLite and server state is handled by the API layer, so a third global store would be weight without benefit. Context carries the small amount of UI and connectivity state.
 - **A real backend instead of a mock.** The brief allowed a mock repository, but a deployed Express and Postgres service proves the sync path end to end against a live database.
 - **A two-step form.** The intake is split into patient info and triage details with a review, which keeps each screen short and thumb-friendly under pressure while still capturing everything in one continuous flow.
 
+## License
+
+Released under the [MIT License](LICENSE).
