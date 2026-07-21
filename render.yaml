@@ -1,23 +1,26 @@
-# Render Blueprint — deploys the RapidTriage API + a managed Postgres.
+# Render Blueprint — deploys the RapidTriage API.
 # Push this repo to GitHub, then in Render: New → Blueprint → pick this repo.
-# Render provisions the database, wires DATABASE_URL, builds, and runs.
-databases:
-  - name: rapidtriage-db
-    databaseName: rapidtriage
-    plan: free
-
+#
+# The database is an external managed Postgres (Neon), not a Render datastore.
+# Render's free Postgres is deleted 30 days after creation, which previously
+# took the API down with `getaddrinfo ENOTFOUND` on the removed host. Neon's
+# free tier has no such expiry.
+#
+# DATABASE_URL is `sync: false`, so it is set once in the Render dashboard
+# (Environment tab) and never committed — it contains a password.
 services:
   - type: web
     name: rapidtriage-api
     runtime: node
     plan: free
+    # Liveness only. The API answers /health even while the database is down,
+    # so a database outage degrades the service instead of restart-looping it.
+    # Readiness is /ready, which reports 503 until migrations succeed.
     healthCheckPath: /health
     buildCommand: npm ci && npm run build:shared && npm --workspace @rapidtriage/api run build
     startCommand: node apps/api/dist/server.js
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: rapidtriage-db
-          property: connectionString
+        sync: false
       - key: NODE_VERSION
         value: "20"
