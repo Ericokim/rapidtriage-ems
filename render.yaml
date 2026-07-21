@@ -1,13 +1,21 @@
 # Render Blueprint — deploys the RapidTriage API.
 # Push this repo to GitHub, then in Render: New → Blueprint → pick this repo.
 #
-# The database is an external managed Postgres (Neon), not a Render datastore.
-# Render's free Postgres is deleted 30 days after creation, which previously
-# took the API down with `getaddrinfo ENOTFOUND` on the removed host. Neon's
-# free tier has no such expiry.
+# DATABASE_URL is `sync: false`: it is set on the service directly and never
+# committed, since it contains a password. It currently points at the Render
+# Postgres `rapidtriage-db` (dpg-d9fjecfavr4c73ccoa2g-a) via its internal
+# connection string, which keeps traffic inside the Oregon region.
 #
-# DATABASE_URL is `sync: false`, so it is set once in the Render dashboard
-# (Environment tab) and never committed — it contains a password.
+# HEADS UP — that database is on the free plan and Render deletes free
+# Postgres 30 days after creation, on 2026-08-20. When it goes, DNS for the
+# host disappears and the API can no longer reach it. This exact expiry (on a
+# previous database) is what caused the outage on 2026-07-19.
+#
+# The API no longer dies when that happens: it serves /health and reports the
+# fault on /ready instead of exiting 1 in a restart loop. To avoid the
+# interruption entirely, move DATABASE_URL to a Postgres without an expiry
+# (a paid Render plan, or an external provider such as Neon) before that date.
+# Nothing in the code needs to change — only the variable.
 services:
   - type: web
     name: rapidtriage-api
